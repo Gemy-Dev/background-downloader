@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-import 'file_download_screen.dart';
+import 'screen/file_download_screen.dart';
 const debug = true;
 
 void main() async {

@@ -2,7 +2,7 @@
 import 'package:file_downloader/service/downloader.dart';
 import 'package:flutter/material.dart';
 
-import 'widget/download_status_widget.dart';
+import '../widget/download_status_widget.dart';
 class FileDownloadScreen extends StatefulWidget {
 
   const FileDownloadScreen({
