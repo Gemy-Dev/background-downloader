@@ -1,22 +1,12 @@
-import 'dart:developer';
 
 import 'package:file_downloader/service/downloader.dart';
-import 'package:file_downloader/service/observer.dart';
 import 'package:flutter/material.dart';
 
+import 'widget/download_status_widget.dart';
 class FileDownloadScreen extends StatefulWidget {
-  /// [url] is the url of the file to be downloaded
-
-
-  /// [index] is the index of the selected file url.
-
-
 
   const FileDownloadScreen({
     super.key,
-
-
-
   });
 
   @override
@@ -45,6 +35,7 @@ class _FileDownloadScreenState extends State<FileDownloadScreen> {
     super.dispose();
   }
 
+final url='https://file-examples.com/storage/fef545ae0b661d470abe676/2017/04/file_example_MP4_1920_18MG.mp4';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +52,7 @@ class _FileDownloadScreenState extends State<FileDownloadScreen> {
                       child: FilledButton(
                         onPressed: () {
                           downLoader.downloadFile(
-                            url:'https://file-examples.com/storage/fef545ae0b661d470abe676/2017/04/file_example_MP4_1920_18MG.mp4',
+                            url:url,
                           );
                         },
                         child: const Text(
@@ -69,57 +60,10 @@ class _FileDownloadScreenState extends State<FileDownloadScreen> {
                         ),
                       ),
                     )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        LinearProgressIndicator(
-                          value: downLoader.downloadTaskProgress / 100,
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Text(
-                          downLoader.getDownloadStatusString(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () async {
-                                downLoader.getDownloadStatusString() ==
-                                        'Downloading'
-                                    ? await downLoader.pauseDownload()
-                                    : await downLoader.resumeDownload();
-                              },
-                              child: Text(
-                                downLoader.getDownloadStatusString() ==
-                                        'Downloading'
-                                    ? 'Puase'
-                                    : 'Reusem',
-                              ),
-                            ),
-                           
-                            IconButton(
-                              onPressed: () async {
-                                await downLoader.cancelDownload();
-                              },
-                              icon: const Icon(
-                                Icons.cancel,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
+                  : DownloadStatusWidget(downLoader: downLoader);
             }),
       ),
     );
   }
 }
+

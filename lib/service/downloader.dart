@@ -13,8 +13,8 @@ const downLoadSenderPort = 'downloader_send_port';
 
 class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
   DownLoader._();
-  static final _instance=DownLoader._();
-  factory DownLoader()=>_instance;
+  static final _instance = DownLoader._();
+  factory DownLoader() => _instance;
   final ReceivePort _port = ReceivePort();
 
   String? downloadTaskId;
@@ -28,7 +28,6 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
 
   /// [initDownloadController] method will initialize the downloader controller and perform certain operations like registering the port, initializing the register callback etc.
   initDownloadController() {
-    log('DownloadsController - initDownloadController called');
     _bindBackgroundIsolate();
   }
 
@@ -40,13 +39,10 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
   /// [_bindBackgroundIsolate] is used to register the [SendPort] with the name [downloader_send_port].
   /// If the registration is successful then it will return true else it will return false.
   _bindBackgroundIsolate() async {
-    log('DownloadsController - _bindBackgroundIsolate called');
     final isSuccess = IsolateNameServer.registerPortWithName(
       _port.sendPort,
-      'downloader_send_port',
+      downLoadSenderPort,
     );
-
-    log('_bindBackgroundIsolate - isSuccess = $isSuccess');
 
     if (!isSuccess) {
       _unbindBackgroundIsolate();
@@ -54,7 +50,6 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
       return;
     } else {
       _port.listen((message) {
-      
         downloadTaskId = message[0];
         downloadTaskStatus = message[1];
         downloadTaskProgress = message[2];
@@ -62,8 +57,8 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
         if (!_isAppInForeground) {
           LocalNotificationService.showTextNotification(
               id: 100,
-              title: '',
-              body: getDownloadStatusString(),
+              title: getDownloadStatusString(),
+              body: '',
               progress: downloadTaskProgress);
         }
         if (message[1] == 2) {
@@ -78,13 +73,10 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void _unbindBackgroundIsolate() {
-    log('DownloadsController - _unbindBackgroundIsolate called');
     IsolateNameServer.removePortNameMapping(downLoadSenderPort);
   }
 
   static registerCallback(String id, int status, int progress) {
-    log("DownloadsController - registerCallback - task id = $id, status = $status, progress = $progress");
-
     final SendPort? send =
         IsolateNameServer.lookupPortByName(downLoadSenderPort);
     send!.send([id, status, progress]);
@@ -92,58 +84,65 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> downloadFile(
       {required String url, bool showNotification = false}) async {
-    log('DownloadsController - downloadFile called');
-    log('DownloadsController - downloadFile - url = $url');
-
-    isDownloading = true;
-
     late String downloadDirPath;
     if (Platform.isIOS) {
       downloadDirPath = (await getDownloadsDirectory())!.path;
     } else {
       downloadDirPath = (await getApplicationDocumentsDirectory()).path;
     }
-final storgeAccess=await Permission.storage.request();
-log(storgeAccess.toString());
-    downloadTaskId = await FlutterDownloader.enqueue(
-      url: url,
-      headers: {}, // optional: header send with url (auth token etc)
-      savedDir: downloadDirPath,
-      saveInPublicStorage: true,
-      showNotification:
-          !_isAppInForeground, // show download progress in status bar (for Android)
-      openFileFromNotification:
-          true, // click on the notification to open the downloaded file (for Android)
-    );
-    notifyListeners();
-  }
+    try {
+      downloadTaskId = await FlutterDownloader.enqueue(
+        url: url,
+        headers: {}, // optional: header send with url (auth token etc)
+        savedDir: downloadDirPath,
+        saveInPublicStorage: true,
+        showNotification:
+            !_isAppInForeground, // show download progress in status bar (for Android)
+        openFileFromNotification:
+            true, // click on the notification to open the downloaded file (for Android)
+      );
+      isDownloading = true;
 
+      notifyListeners();
+    } catch (e) {}
+  }
 
   /// [pauseDownload] pauses the current download task
   Future pauseDownload() async {
+    try {
+      
     log(downloadTaskId ?? '');
     await FlutterDownloader.pause(taskId: downloadTaskId ?? '');
-   
+
     notifyListeners();
+    } catch (e) {
+      
+    }
   }
 
   /// [resumeDownload] resumes the paused download task
   Future resumeDownload() async {
-    log(downloadTaskId ?? '');
+    try {
+      
     await FlutterDownloader.resume(taskId: downloadTaskId ?? '');
     notifyListeners();
+    } catch (e) {
+      
+    }
   }
 
   /// [cancelDownload] cancels the current download task
   Future<void> cancelDownload() async {
-    log(downloadTaskId ?? '');
-
+    try {
     await FlutterDownloader.cancel(taskId: downloadTaskId ?? '');
 
-downloadTaskStatus=5;// 5 is canceld
+    downloadTaskStatus = 5; // 5 is canceld
     isDownloading = false;
     notifyListeners();
-
+      
+    } catch (e) {
+      
+    }
   }
 
   String getDownloadStatusString() {
@@ -191,7 +190,6 @@ downloadTaskStatus=5;// 5 is canceld
     } else if (state == AppLifecycleState.resumed) {
       LocalNotificationService.cancleNotification(100);
       _isAppInForeground = true;
-    
     }
   }
 }
