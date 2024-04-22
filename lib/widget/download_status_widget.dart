@@ -36,27 +36,19 @@ class DownloadStatusWidget extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  downLoader.getDownloadStatusString() ==
-                          'Downloading'
-                      ? await downLoader.pauseDownload()
-                      : await downLoader.resumeDownload();
+                
+                    await downLoader.cancelDownload();
                 },
-                child: Text(
-                  downLoader.getDownloadStatusString() ==
-                          'Downloading'
-                      ? 'Puase'
-                      : 'Reusem',
+                child: const Text(
+                  
+                       'Cancel'
+                     
                 ),
               ),
              
-              IconButton(
-                onPressed: () async {
-                  await downLoader.cancelDownload();
-                },
-                icon: const Icon(
-                  Icons.cancel,
-                ),
-              ),
+             
+              
+              
             ],
           ),
         ],

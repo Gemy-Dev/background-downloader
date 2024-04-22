@@ -58,7 +58,7 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
           LocalNotificationService.showTextNotification(
               id: 100,
               title: getDownloadStatusString(),
-              body: '',
+              body: '$downloadTaskProgress/100',
               progress: downloadTaskProgress);
         }
         if (message[1] == 2) {
@@ -91,9 +91,10 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
       downloadDirPath = (await getApplicationDocumentsDirectory()).path;
     }
     try {
+      isDownloading = true;
       downloadTaskId = await FlutterDownloader.enqueue(
         url: url,
-        headers: {}, // optional: header send with url (auth token etc)
+       // optional: header send with url (auth token etc)
         savedDir: downloadDirPath,
         saveInPublicStorage: true,
         showNotification:
@@ -101,10 +102,11 @@ class DownLoader extends ChangeNotifier with WidgetsBindingObserver {
         openFileFromNotification:
             true, // click on the notification to open the downloaded file (for Android)
       );
-      isDownloading = true;
 
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   /// [pauseDownload] pauses the current download task

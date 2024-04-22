@@ -35,7 +35,7 @@ class _FileDownloadScreenState extends State<FileDownloadScreen> {
     super.dispose();
   }
 
-final url='https://file-examples.com/storage/fef545ae0b661d470abe676/2017/04/file_example_MP4_1920_18MG.mp4';
+final url='https://file-examples.com/storage/fee868065066261f19c04c3/2017/04/file_example_MP4_1920_18MG.mp4';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
